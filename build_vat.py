@@ -1,8 +1,9 @@
 #!/usr/local/bin/python3
 
 import json
+from math import ceil, log2
 from os import listdir
-from os.path import isfile, join
+from os.path import getmtime, isfile, join
 
 import imageio
 import numpy as np
@@ -62,24 +63,29 @@ def save_meta(filename, box, width, height):
         json.dump(meta, f)
 
 def main(data_path, output_path="./output/"):
-    files = [f for f in listdir(data_path) if isfile(join(data_path, f))]
-    files.sort()
+    files = [join(data_path, f) for f in listdir(data_path) if isfile(join(data_path, f)) and f.endswith('.obj')]
+    files.sort(key = lambda x: getmtime(x))
 
     models = []
     max_vertex_count = 0
     box = box_create()
     for file in files:
-        filename = join(data_path, file)
-        model = parse_obj(filename)
+        model = parse_obj(file)
         calculate_normal(model)
         models.append(model)
         max_vertex_count = max(model['face_count'] * 3, max_vertex_count)
         box_expand_box(box, model['box'])
     
-    # model_count is frame_count
     model_count = len(models)
-    vertex_tex = np.zeros((model_count, max_vertex_count, 4))
-    normal_tex = np.zeros((model_count, max_vertex_count, 4))
+    print("max vertex count " + str(max_vertex_count))
+    print("frame count " + str(model_count))
+
+    width = 1 << (ceil(log2(max_vertex_count)))
+    height = 1 << (ceil(log2(model_count)))
+    print("create output texture [{}, {}]".format(width, height))
+
+    vertex_tex = np.zeros((height, width, 4))
+    normal_tex = np.zeros((height, width, 4))
 
     box_min = box['min']
     box_size = box_compute_size(box)
@@ -87,10 +93,11 @@ def main(data_path, output_path="./output/"):
     inv_delta_y = 255.0 / box_size[1]
     inv_delta_z = 255.0 / box_size[2]
 
-    width = max_vertex_count
-    height = model_count
-
+    print("normalizing animation data")
     for y in range(height):
+        if y >= model_count:
+            break
+
         model = models[y]
         vertices = model['vertices']
         normals = model['normals']
@@ -133,9 +140,11 @@ def main(data_path, output_path="./output/"):
             normal_tex[y][i * 3 + 2][1] = n2[1] * 255
             normal_tex[y][i * 3 + 2][2] = n2[2] * 255
             normal_tex[y][i * 3 + 2][3] = 255
+
+    print("save output file")
     save_png(join(output_path, 'vertex_tex.png'), vertex_tex)
     save_png(join(output_path, 'normal_tex.png'), normal_tex)
-    save_meta(join(output_path, 'meta.json'), box, width, height)
+    save_meta(join(output_path, 'meta.json'), box, max_vertex_count, model_count)
 
 if __name__ == '__main__':
-    main('../cache_fluid_4b85f272/mesh')
+    main('../export/')
