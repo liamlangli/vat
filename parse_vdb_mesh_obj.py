@@ -2,6 +2,7 @@
 
 from lmath import box_create, box_expand_point
 
+
 def parse_obj(filename, swapyz=True):
     vertices = []
     faces = []

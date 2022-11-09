@@ -1,5 +1,6 @@
 from math import sqrt
 
+
 def vector_add(a, b):
     return (a[0] + b[0], a[1] + b[1], a[2] + b[2])
 
@@ -42,7 +43,7 @@ def box_expand_point(box, a):
 def box_expand_box(a, b):
     a['min'][0] = min(a['min'][0], b['min'][0])
     a['min'][1] = min(a['min'][1], b['min'][1])
-    a['min'][2] = min(a['min'][2], a['min'][2])
+    a['min'][2] = min(a['min'][2], b['min'][2])
 
     a['max'][0] = max(a['max'][0], b['max'][0])
     a['max'][1] = max(a['max'][1], b['max'][1])
