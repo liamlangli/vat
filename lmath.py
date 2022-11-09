@@ -11,7 +11,7 @@ def vector_normalize(a):
     else:
         return (a[0] / l, a[1] / l, a[2] / l)
 
-def vector_cross(a, b):
+def vector_cross(b, a):
     ax = a[0]
     ay = a[1]
     az = a[2]

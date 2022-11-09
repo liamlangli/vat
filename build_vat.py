@@ -50,6 +50,9 @@ def triangle_cross_vector(v0, v1, v2):
 
     return vector_cross((ax, ay, az), (bx, by, bz))
 
+def save_exr(filename, data):
+    imageio.imwrite(filename, data.astype(np.float32))
+
 def save_png(filename, data):
     imageio.imwrite(filename, data.astype(np.uint8))
 
@@ -84,14 +87,14 @@ def main(data_path, output_path="./output/"):
     height = 1 << (ceil(log2(model_count)))
     print("create output texture [{}, {}]".format(width, height))
 
-    vertex_tex = np.zeros((height, width, 4))
+    vertex_tex = np.zeros((height, width, 3))
     normal_tex = np.zeros((height, width, 4))
 
     box_min = box['min']
     box_size = box_compute_size(box)
-    inv_delta_x = 255.0 / box_size[0]
-    inv_delta_y = 255.0 / box_size[1]
-    inv_delta_z = 255.0 / box_size[2]
+    inv_delta_x = 1.0 / box_size[0]
+    inv_delta_y = 1.0 / box_size[1]
+    inv_delta_z = 1.0 / box_size[2]
 
     print("normalizing animation data")
     for y in range(height):
@@ -114,17 +117,14 @@ def main(data_path, output_path="./output/"):
             vertex_tex[y][i * 3][0] = (v0[0] - box_min[0]) * inv_delta_x
             vertex_tex[y][i * 3][1] = (v0[1] - box_min[1]) * inv_delta_y
             vertex_tex[y][i * 3][2] = (v0[2] - box_min[2]) * inv_delta_z
-            vertex_tex[y][i * 3][3] = 255
 
             vertex_tex[y][i * 3 + 1][0] = (v1[0] - box_min[0]) * inv_delta_x
             vertex_tex[y][i * 3 + 1][1] = (v1[1] - box_min[1]) * inv_delta_y
             vertex_tex[y][i * 3 + 1][2] = (v1[2] - box_min[2]) * inv_delta_z
-            vertex_tex[y][i * 3 + 1][3] = 255
 
             vertex_tex[y][i * 3 + 2][0] = (v2[0] - box_min[0]) * inv_delta_x
             vertex_tex[y][i * 3 + 2][1] = (v2[1] - box_min[1]) * inv_delta_y
             vertex_tex[y][i * 3 + 2][2] = (v2[2] - box_min[2]) * inv_delta_z
-            vertex_tex[y][i * 3 + 2][3] = 255
 
             normal_tex[y][i * 3][0] = n0[0] * 255
             normal_tex[y][i * 3][1] = n0[1] * 255
@@ -142,8 +142,8 @@ def main(data_path, output_path="./output/"):
             normal_tex[y][i * 3 + 2][3] = 255
 
     print("save output file")
-    save_png(join(output_path, 'vertex_tex.png'), vertex_tex)
-    save_png(join(output_path, 'normal_tex.png'), normal_tex)
+    save_exr(join(output_path, 'vat_vertex_tex.exr'), vertex_tex)
+    save_png(join(output_path, 'vat_normal_tex.png'), normal_tex)
     save_meta(join(output_path, 'meta.json'), box, max_vertex_count, model_count)
 
 if __name__ == '__main__':
