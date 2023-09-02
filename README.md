@@ -9,10 +9,10 @@
 
 ## Usage
 - Resource Generation
-    1. Export blender animation sequences in wavefront obj format(DO NOT EXPORT MATERIALS).
-    2. Install python3 and python requirements wrote in `requirements.txt`
-    3. Modify `build_vat.py` set data_path to your obj models path.
-    4. Create `output` folder in the same directory with `build_vat.py` 
+    1. Install python3 and python requirements wrote in `requirements.txt`
+    2. Modify `build_vat.py` set data_path to your obj models path.
+    3. Create `output` folder in the same directory with `build_vat.py`
+    4. Export blender animation sequences in wavefront obj format into `output` folder. (DO NOT EXPORT MATERIALS).
     5. Run `./build_vat.py`
     6. Copy `unity/create_vat_mesh.cs` to unity `Assets/Editor` folder (create it if you don't have it)
 - Unity Asset
