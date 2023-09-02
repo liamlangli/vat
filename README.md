@@ -4,6 +4,8 @@
 - Blender
 - Python3
     - imageio (with freeimage plugin)
+         - MacOS `brew install freeimage`
+         - Windows `https://imageio.readthedocs.io/en/v2.5.0/format_exr-fi.html`
     - numpy
 - Unity [URP]
 
